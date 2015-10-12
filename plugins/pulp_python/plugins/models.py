@@ -3,16 +3,28 @@ import hashlib
 import re
 import tarfile
 
+from mongoengine import StringField
+from pulp.server.db.model import ContentUnit
+
 from pulp_python.common import constants
 
 
 DEFAULT_CHECKSUM_TYPE = 'sha512'
 
 
-class Package(object):
+class Package(ContentUnit):
     """
     This class represents a Python package.
     """
+    # For backward compatibility
+    _ns = StringField(default='units_python_package')
+    unit_type_id = StringField(db_field='_content_type_id', required=True, default='python_package')
+
+    unit_key_fields = ('name', 'version')
+
+    meta = {'collection': 'units_python_package',
+            'indexes': [],
+            'allow_inheritance': False}
 
     TYPE = constants.PACKAGE_TYPE_ID
     # The full list of supported attributes. Attributes beginning with underscore are specific to
